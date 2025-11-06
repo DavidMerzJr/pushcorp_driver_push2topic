@@ -98,7 +98,10 @@ class AFDDriver(Node):
         res.success = response[STATUS_KEY] == SUCCESS_VALUE
         if not res.success:
             res.message = 'Failed to weigh payload'
-
+        else:
+            res.message = 'Weighed payload'
+        
+        udp_socket.close()
         return res
 
     def set_control_mode(self, req: SetControlMode.Request, res: SetControlMode.Response) -> SetControlMode.Response:
@@ -106,13 +109,19 @@ class AFDDriver(Node):
         if not req.mode in (0, 1):
             res.success = False
             res.message = f'Mode must either be 0 (position) or 1 (force)'
+            udp_socket.close()
             return res
 
         response = self.send(udp_socket, f'{SET_CONTROL_MODE_ENDPOINT}={req.mode}')
         res.success = response[STATUS_KEY] == SUCCESS_VALUE
         if not res.success:
             res.message = 'Failed to set command mode'
-
+        else:
+            mode = ""
+            mode = "position" if (req.mode == 0) else "force"
+            res.message = f'Set command mode to {mode}'
+        
+        udp_socket.close()
         return res
 
     def command_force(self, req: CommandValue.Request, res: CommandValue.Response) -> CommandValue.Response:
@@ -121,7 +130,9 @@ class AFDDriver(Node):
         res.success = response[STATUS_KEY] == SUCCESS_VALUE
         if not res.success:
             res.message = 'Failed to command force'
-
+        else: 
+            res.message = f'Commanded force to {req.value}'
+        udp_socket.close()
         return res
 
     def command_position(self, req: CommandValue.Request, res: CommandValue.Response) -> CommandValue.Response:
@@ -130,7 +141,9 @@ class AFDDriver(Node):
         res.success = response[STATUS_KEY] == SUCCESS_VALUE
         if not res.success:
             res.message = 'Failed to command position'
-
+        else:
+            res.message = f'Commanded position to {req.value}'
+        udp_socket.close()
         return res
 
 
