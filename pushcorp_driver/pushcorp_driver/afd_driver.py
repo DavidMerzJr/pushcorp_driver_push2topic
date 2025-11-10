@@ -137,6 +137,11 @@ class AFDDriver(Node):
 
     def command_position(self, req: CommandValue.Request, res: CommandValue.Response) -> CommandValue.Response:
         udp_socket = create_socket()
+        if req.value < 0 or req.value > 20:
+            res.success = False
+            res.message = f'Commanded position {req.value} must be in the range [0, 20]. Not setting position.'
+            udp_socket.close()
+            return res
         response = self.send(udp_socket, f'{COMMAND_POSITION_ENDPOINT}={req.value}')
         res.success = response[STATUS_KEY] == SUCCESS_VALUE
         if not res.success:
