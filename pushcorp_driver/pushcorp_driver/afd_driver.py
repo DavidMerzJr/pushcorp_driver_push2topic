@@ -81,8 +81,12 @@ class AFDDriver(Node):
 
         # Socket communication
         udp_socket = create_socket()
-        pos_msg = populate_value(udp_socket, POSITION_ENDPOINT)
-        force_msg = populate_value(udp_socket, FORCE_ENDPOINT)
+        udp_socket.settimeout(0.3)
+        try:
+            pos_msg = populate_value(udp_socket, POSITION_ENDPOINT)
+            force_msg = populate_value(udp_socket, FORCE_ENDPOINT)
+        except:
+            self.get_logger().info('udp socket timed out')
         udp_socket.close()
 
         # Publish the ROS message
